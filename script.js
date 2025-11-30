@@ -94,4 +94,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if(e.key === 'Enter') el.click();
         });
     });
+
+    // lightbox functionality for project images
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.querySelector('.lightbox-content');
+    const closeBtn = document.querySelector('.lightbox-close');
+
+    document.querySelectorAll('.lightbox-img').forEach(img => {
+        img.addEventListener('click', () => {
+            lightbox.style.display = 'flex';
+            lightboxImg.src = img.src;
+            lightbox.Img.alt = img.alt;
+        });
+    });
+
+    // close button
+    closeBtn.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+
+    // click outside image closes
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) lightbox.style.display = 'none';
+    });
+    
 });
