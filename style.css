@@ -78,6 +78,45 @@ body{
 .card-body p{color:var(--muted);margin:0 0 12px}
 .card-footer{display:flex;gap:12px;align-items:center}
 
+/* HOME PAGE */
+
+/* Light mode: Home page container */
+body.light .home-page {
+    background: rgba(255, 255, 255, 0.9); /* semi-transparent card */
+    padding: 44px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px); /* soft blur behind */
+    transition: background 0.3s ease;
+}
+
+/* Text readability */
+body.light .home-page,
+body.light .home-page h1,
+body.light .home-page h2,
+body.light .home-page h3,
+body.light .home-page p {
+    color: #555; /* muted gray like cert list */
+}
+
+/* Project cards inside home page */
+body.light .home-page .project-card {
+    background: rgba(255, 255, 255, 0.95);
+    color: #555;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Hero text gradient or style stays same but ensure readability */
+body.light .home-page .hero h1,
+body.light .home-page .hero h2 {
+    color: #444; /* muted dark for headings */
+}
+
+/* Buttons (e.g., resume) stay visible */
+body.light .home-page .btn {
+    background: #000; 
+    color: #fff;
+}
+
 /* ABOUT */
 .about-page{padding:44px 0}
 .about-grid{display:grid;grid-template-columns:300px 1fr;gap:30px;align-items:center}
@@ -106,6 +145,43 @@ body.light .certs ul {
 /* Soften picture shadow so it’s not so heavy on light background */
 body.light .about-pic {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* LIGHT MODE: Projects Page */
+body.light .projects-page {
+    background: rgba(255, 255, 255, 0.9); /* semi-transparent container */
+    padding: 44px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px); /* soft blur behind */
+    transition: background 0.3s ease;
+}
+
+/* Make all text readable */
+body.light .projects-page,
+body.light .projects-page h1,
+body.light .projects-page h2,
+body.light .projects-page h3,
+body.light .projects-page p {
+    color: #555; /* muted gray, like About section */
+}
+
+/* Project cards */
+body.light .projects-page .project-card {
+    background: rgba(255, 255, 255, 0.95);
+    color: #555;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Images shadow softer in light mode */
+body.light .projects-page .card-img {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-radius: 16px;
+}
+
+/* Buttons visible */
+body.light .projects-page .btn {
+    background: #000;
+    color: #fff;
 }
 
 /* FOOTER */
