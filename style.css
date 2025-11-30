@@ -34,6 +34,14 @@ body{
 }
 .container{max-width:var(--container);margin:0 auto;padding:0 20px}
 
+/* Daily greeting style */
+.daily-greeting {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 0 0 6px;
+}
+
 /* NAVBAR */
 .navbar{
   position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(0,0,0,0.2), transparent);

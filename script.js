@@ -63,7 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', toggleTheme);
     });
 
-    // InsersectionObserver for scroll animations
+    // Dynamic daily greeting
+    const greetingEl = document.getElementById("daily-greeting");
+    if(greetingEl) {
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const today = new Date();
+        greetingEl.textContent = `Happy ${days[today.getDay()]}!`;
+    }
+
+    // IntersectionObserver for scroll animations
     const animateEls = document.querySelectorAll('[data-animate]');
     if('IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries, obs) => {
