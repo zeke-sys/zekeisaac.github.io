@@ -106,7 +106,7 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// drawing the trie structure in SVG
+// drawing the trie structure in SVG (scalable vector graphics)
 const svgNS = "http://www.w3.org/2000/svg";
 
 function drawTrieSVG(trie, svgId) {
