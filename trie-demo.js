@@ -45,7 +45,7 @@ class Trie { // main trie structure
         }
 
         return this._collect(node, prefix) // gather words from this node
-            .sort((a, b) => (b.freq + (b.weight||0)) - (a.freq + a.weight||0) || a.word.localeCompare(b.word))
+            .sort((a, b) => ((b.freq + (b.weight||0)) - (a.freq + a.weight||0))) || a.word.localeCompare(b.word)
             .map(x => x.word);
     }
 
@@ -160,7 +160,7 @@ if (input) {
         const query = input.value.trim().toLowerCase();
 
         suggestions.innerHTML = "";
-        if (query.length === 0) return;
+        if (!query) return;
 
         const matches = trie.autocomplete(query).slice(0, 10);
 
@@ -198,6 +198,7 @@ if (input) {
 
                 highlightWordInSVG(word); // highlight the selected word
             });
+            suggestions.appendChild(li);
         });
 
         // Close suggestions when clicking outside
