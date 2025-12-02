@@ -9,6 +9,7 @@ class TrieNode { // represents each node in the trie
         this.children = {};
         this.isEnd = false;
         this.freq = 0; // frequency for weighted suggestions
+        this.weight = 0; // cumulative weight for subtree
     }
 }
 
@@ -43,20 +44,30 @@ class Trie { // main trie structure
         }
 
         return this._collect(node, prefix) // gather words from this node
-            .sort((a, b) => b.freq - a.freq || a.word.localeCompare(b.word))
+            .sort((a, b) => (b.freq + b.weight) - (a.freq + a.weight) || a.word.localeCompare(b.word))
             .map(x => x.word);
     }
 
     _collect(node, prefix) { // helper to collect words from a given node
         let results = [];
 
-        if (node.isEnd) results.push({ word: prefix, freq: node.freq });
+        if (node.isEnd) results.push({ word: prefix, freq: node.freq, weight: node.weight });
 
         for (let char in node.children) {
             results.push(...this._collect(node.children[char], prefix + char));
         }
 
         return results;
+    }
+
+    // get node directly (for highlighting)
+    getNode(word) {
+        let node = this.root;
+        for (let char of word.toLowerCase()) {
+            if (!node.children[char]) return null;
+            node = node.children[char];
+        }
+        return node;
     }
 }
 
@@ -104,7 +115,28 @@ const words = [
     "dog", "dodge", "doll",
     "encrypt", "encryption",
     "elephant", "elegant", "elevator",
-    "energy", "engine", "engineer"
+    "energy", "engine", "engineer",
+    "function", "fun", "fundamental",
+    "graph", "graphic", "graphics",
+    "hello", "help", "helicopter",
+    "internet", "internal", "international",
+    "java", "javascript", "jazz",
+    "keyboard", "key", "kettle",
+    "lambda", "landscape", "language",
+    "machine", "machinelearning", "macro",
+    "network", "net", "neural",
+    "object", "objective", "obstacle",
+    "python", "pyramid", "pyrotechnics",
+    "query", "queue", "quantum",
+    "robot", "robust", "rocket",
+    "security", "secure", "segment",
+    "tree", "trie", "trigger",
+    "user", "usage", "utility",
+    "vector", "velocity", "vehicle",
+    "web", "website", "webinar",
+    "xml", "xylophone", "xenon",
+    "yaml", "yacht", "yarn",
+    "zebra", "zenith", "zephyr"
 ];
 
 words.forEach(w => trie.insert(w)); // equal frequency for simplicity
@@ -134,12 +166,20 @@ input.addEventListener('input', () => { // on input change
         const li = document.createElement("li");
 
         // Highlight prefix
-        li.innerHTML =
-            `<strong>${query}</strong>${word.slice(query.length)}`;
+        li.innerHTML = `<strong>${query}</strong>${word.slice(query.length)}`;
 
         li.addEventListener("click", () => {
+            // increase weight for clicked word
+            const node = trie.getNode(word);
+            if (node) node.weight++; // increment weight to boost future suggestions
+
             input.value = word;
             suggestions.innerHTML = "";
+
+            // hightlight path in SVG
+            highlightWordInSVG(word);
+
+            drawTrieSVG(trie, 'trie-svg'); // redraw to reflect updated weights
         });
 
         suggestions.appendChild(li);
@@ -157,11 +197,13 @@ document.addEventListener("click", (e) => {
 
 const svgNS = "http://www.w3.org/2000/svg";
 const nodeElementsMap = new Map(); // needed for highlight
+const edgeElements = []; // store edge elements for animation
 
 function drawTrieSVG(trie, svgId) { // render trie structure as SVG
     const svg = document.getElementById(svgId);
     svg.innerHTML = "";
     nodeElementsMap.clear();
+    edgeElements.length = 0;
 
     const nodeRadius = 18;
     const horizontalSpacing = 60;
@@ -187,7 +229,7 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
         const midX = (startX + childX - horizontalSpacing) / 2;
         positions.push({ node, x: midX, depth, letter: parentLetter });
 
-        return positions;
+        return positions; // return accumulated positions
     }
 
     const positions = layout(trie.root); // get all node positions
@@ -215,7 +257,9 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
             line.setAttribute('stroke', '#4da6ff');
             line.setAttribute('stroke-width', 2);
 
+            line.classList("trie-edge");
             svg.appendChild(line);
+            edgeElements.push(line); // store for animation
         }
     });
 
@@ -226,14 +270,15 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
         const circle = document.createElementNS(svgNS, 'circle');
         circle.setAttribute('cx', x);
         circle.setAttribute('cy', depth * verticalSpacing);
-        circle.setAttribute('r', nodeRadius);
-        circle.setAttribute(
-            'fill',
-            node.isEnd ? '#4da6ff' : '#11141a'
-        );
+
+        const r = nodeRadius + node.weight * 2; // size by weight
+        circle.setAttribute('r', r);
+
+        circle.setAttribute('fill', node.isEnd ? '#4da6ff' : '#11141a');
         circle.setAttribute('stroke', '#4da6ff');
         circle.setAttribute('stroke-width', 2);
 
+        circle.classList.add("trie-node"); // for animation
         svg.appendChild(circle);
 
         // Letter label
@@ -254,8 +299,30 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
             circle.appendChild(title);
         }
 
-        nodeElementsMap.set(node, circle);
+        nodeElementsMap.set(node, circle); // map node to its circle element
     });
+
+    // animate nodes and edges
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.trie-node').forEach(n => n.classList.add('visible'));
+        document.querySelectorAll('.trie-edge').forEach(e => e.classList.add('visible'));
+    });
+}
+
+function highlightWordInSVG(word) { // highlight path for given word
+    let node = trie.root;
+
+    for (let char of word.toLowerCase()) {
+        if (!node.children[char]) return; // no path found
+        node = node.children[char];
+
+        const circle = nodeElementsMap.get(node);
+        if (circle) {
+            circle.classList.remove("pulse-highlight"); // reset
+            void circle.offsetWidth; // trigger reflow
+            circle.classList.add("pulse-highlight"); // add highlight
+        }
+    }
 }
 
 // 6. INPUT-BASED PATH HIGHLIGHTING
@@ -313,4 +380,10 @@ input.addEventListener("keydown", (e) => { // handle arrow keys and enter
 // 8. DRAW TRIE SVG ON PAGE LOAD
 
 drawTrieSVG(trie, 'trie-svg'); // render trie diagram
+
+// End of trie-demo.js
+
+/* ============================================================
+   END OF TRIE AUTOCOMPLETE DEMO WITH SVG VISUALIZATION
+   ============================================================ */
 
