@@ -288,6 +288,11 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
             line.classList.add("trie-edge");
             svg.appendChild(line);
             edgeElements.push(line); // store for animation
+
+            // store reference from child node to its parent line
+            let existing = nodeElementsMap.get(child) || {};
+            existing.parentLine = line;
+            nodeElementsMap.set(child, existing);
         }
     });
 
@@ -307,6 +312,7 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
         circle.setAttribute('stroke', '#4da6ff');
         circle.setAttribute('stroke-width', 2);
         circle.classList.add("trie-node"); // for animation
+        circle.dataset.isEnd = node.isEnd ? 'true' : 'false';
 
         // attach node reference for later highlight (store node ref on element)
         circle.__trie_node_ref = node;
@@ -331,7 +337,10 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
             circle.appendChild(title);
         }
 
-        nodeElementsMap.set(node, { circle, parentLine }); // map node to its circle element
+        // merging with existing entry
+        let existing = nodeElementsMap.get(node) || {};
+        existing.circle = circle;
+        nodeElementsMap.set(node, existing);
     });
 
     // trigger fade-in of nodes + edges (css classes)
@@ -362,10 +371,12 @@ function highlightWordInSVG(word) { // highlight path for given word
 input.addEventListener('input', () => { // on input change
     const query = input.value.trim().toLowerCase();
 
-    // reset all nodes
-    nodeElementsMap.forEach((circle, parentLine) => {
-        circle.setAttribute('fill', circle.dataset.isEnd === 'true' ? '#4da6ff' : '#11141a');
-        if (parentLine) parentLine.setAttribute('stroke', '#4da6ff'); // rest edge
+    // reset all nodes + edges
+    nodeElementsMap.forEach((data, node) => {
+        if (!data.circle) return;
+        const isEnd = data.circle.dataset.isEnd === 'true';
+        data.circle.setAttribute('fill', isEnd ? '#4da6ff' : '#11141a');
+        if (data.parentLine) data.parentLine.setAttribute('stroke', '#4da6ff'); // rest edge
     });
 
     if (!query) return;
@@ -375,10 +386,12 @@ input.addEventListener('input', () => { // on input change
         if (!node.children[char]) return;
         node = node.children[char];
 
-        const nodeData = nodeElementsMap.get(node);
-        if (nodeData) {
-            nodeData.circle.setAttribute('fill', 'var(--accent)'); // highlight node
-            if (nodeData.parentLine) nodeData.parentLine.setAttribute('stroke', 'var(--accent'); // highlight edge
+        const data = nodeElementsMap.get(node);
+        if (data && data.circle) {
+            const highlightColor = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#ff8c42'; // fallback bright orange
+
+            data.circle.setAttribute('fill', highlightColor); // highlight node
+            if (data.parentLine) data.parentLine.setAttribute('stroke', highlightColor); // highlight edge
         }
     }
 });
