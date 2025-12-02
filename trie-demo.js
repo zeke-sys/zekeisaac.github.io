@@ -422,29 +422,31 @@ if (input) {
         // re-render svg (weights, counts, layout may change)
         drawTrieSVG(trie, 'trie-svg');
 
-        if (!query) return;
-        highlightPrefix(query);
+        if (!query) highlightPrefix(query);
     });
+
     // highlight all nodes & edges matching the prefix
     function highlightPrefix(prefix) {
         let node = trie.root;
         const accent = getAccentColor();
 
-        for (const char of prefix) {
-            if (!node.children[char]) return;
+        // reset all nodes & edges to base colors first
+        nodeElementsMap.forEach(({ circle, parentLine }, n) => {
+            circle.setAttribute('fill', n.isEnd ? '#4da6ff' : '#11141a');
+            if (parentLine) parentLine.setAttribute('stroke', '#4da6ff');
+        });
+
+        // traverse trie along thre prefix and lightlight
+        for (let char of prefix) {
+            if (!node.children[char]) return; // stop if path breaks
             node = node.children[char];
 
-            const el = nodeElementsMap.get(node);
-            if (!el) continue;
+            const data = nodeElementsMap.get(node);
+            if (!data) continue;
 
-            // applying highlight styling
-            el.circle.classList.add("highlighted-node");
-            if (el.parentLine) {
-                el.parentLine.classList.add("highlighted-edge");
-            }
-            // override with dynamic color
-            el.circle.style.fill = accent;
-            if (el.parentLine) el.parentLine.style.stroke = accent;
+            // highlight node and parent edge
+            data.circle.setAttribute('fill', accent);
+            if (data.parentLine) data.parentLine.setAttribute('stroke', accent);
         }   
     }
 }
