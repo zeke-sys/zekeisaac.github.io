@@ -186,22 +186,29 @@ if (input) {
                 input.value = word;
                 suggestions.innerHTML = "";
 
-                // hightlight path in SVG and redraw to reflect new weights
-                highlightWordInSVG(word);
-                drawTrieSVG(trie, 'trie-svg'); // redraw to reflect updated weights
-            });
+                // update node sizes and highlight path
+                nodeElementsMap.forEach(({ circle }) => {
+                    const nodeRef = circle.__trie_node_ref;
+                    if (!nodeRef) return;
 
-            suggestions.appendChild(li);
+                    // scale radius by updated weight
+                    const r = Math.max(10, 18 + (Number(nodeRef.weight) || 0) * 2);
+                    circle.setAttribute('r', r);
+                });
+
+                highlightWordInSVG(word); // highlight the selected word
+            });
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!document.querySelector(".autocomplete-box").contains(e.target)) {
+                suggestions.innerHTML = "";
+            }
         });
     });
-
-    // Close suggestions when clicking outside
-    document.addEventListener("click", (e) => {
-        if (!document.querySelector(".autocomplete-box").contains(e.target)) {
-            suggestions.innerHTML = "";
-        }
-    });
 }
+
 
 // 5. SVG TRIE DIAGRAM RENDERING
 
@@ -419,26 +426,26 @@ if (input) {
     input.addEventListener('input', () => { // on input change
         const query = input.value.trim().toLowerCase();
 
-        // re-render svg (weights, counts, layout may change)
-        drawTrieSVG(trie, 'trie-svg');
+        if (!query) return;
 
-        if (!query) highlightPrefix(query);
+        // highlight
+        highlightPrefix(query);
     });
 
     // highlight all nodes & edges matching the prefix
     function highlightPrefix(prefix) {
-        let node = trie.root;
         const accent = getAccentColor();
 
         // reset all nodes & edges to base colors first
-        nodeElementsMap.forEach(({ circle, parentLine }, n) => {
-            circle.setAttribute('fill', n.isEnd ? '#4da6ff' : '#11141a');
+        nodeElementsMap.forEach(({ circle, parentLine }, node) => {
+            circle.setAttribute('fill', node.isEnd ? '#4da6ff' : '#11141a');
             if (parentLine) parentLine.setAttribute('stroke', '#4da6ff');
         });
 
         // traverse trie along thre prefix and lightlight
+        let node = trie.root;
         for (let char of prefix) {
-            if (!node.children[char]) return; // stop if path breaks
+            if (!node.children[char]) break; // stop if path breaks
             node = node.children[char];
 
             const data = nodeElementsMap.get(node);
