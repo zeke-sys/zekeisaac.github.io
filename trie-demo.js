@@ -221,29 +221,34 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
     const verticalSpacing = 70;
 
     // Calculate layout positions
-    function layout(node, depth = 0, x = 0, parentLetter = '', positions = []) {
+    function layout(node, depth = 0, x = 0, parentLetter = '') {
         const keys = Object.keys(node.children).sort();
+        const positions = [];
 
         if (keys.length === 0) {
             positions.push({ node, x, depth, letter: parentLetter });
-            return positions;
+            return {positions, width: 1};
         }
 
-        let startX = x;
+        let totalWidth = 0;
         let childX = x;
 
         keys.forEach(key => {
-            positions = layout(node.children[key], depth + 1, childX, key, positions);
-            childX += horizontalSpacing;
+            const child = node.children[key];
+            const { positions: childPositions, width: childWidth } = layout(child, depth + 1, childX, key);
+
+            positions.push(...childPositions);
+            childX += childWidth * 70; // horizontalSpacing
+            totalWidth += childWidth;
         });
 
-        const midX = (startX + childX - horizontalSpacing) / 2;
-        positions.push({ node, x: midX, depth, letter: parentLetter });
+        const mid = x + (totalWidth * 70 - 70) / 2; // centering node above its children
+        positions.push({ node, x: mid, depth, letter: parentLetter });
 
-        return positions; // return accumulated positions
+        return { positions, width: totalWidth }; // return accumulated positions
     }
 
-    const positions = layout(trie.root); // get all node positions
+    const { positions } = layout(trie.root); // get all node positions
 
     // fallbadck if positions empty
     if (!positions || positions.length === 0) {
