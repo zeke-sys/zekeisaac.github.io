@@ -45,7 +45,12 @@ class Trie { // main trie structure
         }
 
         return this._collect(node, prefix) // gather words from this node
-            .sort((a, b) => ((b.freq + (b.weight||0)) - (a.freq + a.weight||0))) || a.word.localeCompare(b.word)
+            .sort((a, b) => {
+                const aw = (a.freq + (a.weight || 0));
+                const bw = (b.freq + (b.weight || 0));
+                if (bw !== aw) return bw - aw; // weighted frequency
+                return a.word.localeCompare(b.word); // alphabetical
+            })
             .map(x => x.word);
     }
 
