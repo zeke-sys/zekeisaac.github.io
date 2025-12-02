@@ -160,7 +160,7 @@ if (input) {
         const query = input.value.trim().toLowerCase();
 
         suggestions.innerHTML = "";
-        if (!query) return;
+        if (query.length === 0) return;
 
         const matches = trie.autocomplete(query).slice(0, 10);
 
@@ -186,27 +186,21 @@ if (input) {
                 input.value = word;
                 suggestions.innerHTML = "";
 
-                // update node sizes and highlight path
-                nodeElementsMap.forEach(({ circle }) => {
-                    const nodeRef = circle.__trie_node_ref;
-                    if (!nodeRef) return;
-
-                    // scale radius by updated weight
-                    const r = Math.max(10, 18 + (Number(nodeRef.weight) || 0) * 2);
-                    circle.setAttribute('r', r);
-                });
-
+                // highlight path in SVG
                 highlightWordInSVG(word); // highlight the selected word
+                drawTrieSVG(trie, 'trie-svg')
             });
-            suggestions.appendChild(li);
-        });
 
-        // Close suggestions when clicking outside
-        document.addEventListener("click", (e) => {
-            if (!document.querySelector(".autocomplete-box").contains(e.target)) {
-                suggestions.innerHTML = "";
-            }
+            suggestions.appendChild(li);
+
         });
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!document.querySelector(".autocomplete-box").contains(e.target)) {
+                suggestions.innerHTML = "";
+        }
     });
 }
 
