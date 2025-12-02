@@ -426,8 +426,6 @@ if (input) {
     input.addEventListener('input', () => { // on input change
         const query = input.value.trim().toLowerCase();
 
-        if (!query) return;
-
         // highlight
         highlightPrefix(query);
     });
@@ -442,7 +440,7 @@ if (input) {
             if (parentLine) parentLine.setAttribute('stroke', '#4da6ff');
         });
 
-        // traverse trie along thre prefix and lightlight
+        // traverse trie along the prefix and lightlight
         let node = trie.root;
         for (let char of prefix) {
             if (!node.children[char]) break; // stop if path breaks
@@ -453,8 +451,16 @@ if (input) {
 
             // highlight node and parent edge
             data.circle.setAttribute('fill', accent);
+            data.circle.classList.add('pulse-highlight');
             if (data.parentLine) data.parentLine.setAttribute('stroke', accent);
         }   
+
+        //remove pulse after 500ms
+        setTimeout(() => {
+            nodeElementsMap.forEach(({ circle }) => {
+                if (circle) circle.classList.remove('pulse-highlight');
+            });
+        }, 500);
     }
 }
 
