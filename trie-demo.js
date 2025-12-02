@@ -331,7 +331,7 @@ function drawTrieSVG(trie, svgId) { // render trie structure as SVG
             circle.appendChild(title);
         }
 
-        nodeElementsMap.set(node, circle); // map node to its circle element
+        nodeElementsMap.set(node, { circle, parentLine }); // map node to its circle element
     });
 
     // trigger fade-in of nodes + edges (css classes)
@@ -363,8 +363,9 @@ input.addEventListener('input', () => { // on input change
     const query = input.value.trim().toLowerCase();
 
     // reset all nodes
-    nodeElementsMap.forEach((circle, node) => {
-        circle.setAttribute('fill', node.isEnd ? '#4da6ff' : '#11141a');
+    nodeElementsMap.forEach((circle, parentLine) => {
+        circle.setAttribute('fill', circle.dataset.isEnd === 'true' ? '#4da6ff' : '#11141a');
+        if (parentLine) parentLine.setAttribute('stroke', '#4da6ff'); // rest edge
     });
 
     if (!query) return;
@@ -374,8 +375,11 @@ input.addEventListener('input', () => { // on input change
         if (!node.children[char]) return;
         node = node.children[char];
 
-        const circle = nodeElementsMap.get(node);
-        if (circle) circle.setAttribute('fill', 'var(--accent)'); // highlight
+        const nodeData = nodeElementsMap.get(node);
+        if (nodeData) {
+            nodeData.circle.setAttribute('fill', 'var(--accent)'); // highlight node
+            if (nodeData.parentLine) nodeData.parentLine.setAttribute('stroke', 'var(--accent'); // highlight edge
+        }
     }
 });
 
