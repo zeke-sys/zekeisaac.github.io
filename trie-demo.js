@@ -427,42 +427,28 @@ if (input) {
     input.addEventListener('input', () => { // on input change
         const query = input.value.trim().toLowerCase();
 
-        // highlight
-        highlightPrefix(query);
-    });
-
-    // highlight all nodes & edges matching the prefix
-    function highlightPrefix(prefix) {
-        const accent = getAccentColor();
-
-        // reset all nodes & edges to base colors first
-        nodeElementsMap.forEach(({ circle, parentLine }, node) => {
-            circle.setAttribute('fill', node.isEnd ? '#4da6ff' : '#11141a');
-            if (parentLine) parentLine.setAttribute('stroke', '#4da6ff');
+        // reset all nodes and edges to base color
+        nodeElementsMap.forEach((data) => {
+            if (!data || !data.circle) return;
+            data.circle.setAttribute('fill', data.circle.__trie_node_ref && data.circle.__trie_node_ref.isEnd ? '#4da6ff' : '#11141a');
+            if (data.parentLine) data.parentLine.setAttribute('stroke', '#4da6ff');
         });
 
-        // traverse trie along the prefix and lightlight
+        if (!query) return;
+
         let node = trie.root;
-        for (let char of prefix) {
-            if (!node.children[char]) break; // stop if path breaks
+        for (let char of query) {
+            if (!node.children[char]) return;
             node = node.children[char];
 
-            const data = nodeElementsMap.get(node);
-            if (!data) continue;
-
-            // highlight node and parent edge
-            data.circle.setAttribute('fill', accent);
-            data.circle.classList.add('pulse-highlight');
-            if (data.parentLine) data.parentLine.setAttribute('stroke', accent);
-        }   
-
-        //remove pulse after 500ms
-        setTimeout(() => {
-            nodeElementsMap.forEach(({ circle }) => {
-                if (circle) circle.classList.remove('pulse-highlight');
-            });
-        }, 500);
-    }
+            const nodeData = nodeElementsMap.get(node);
+            if (nodeData) {
+                const accent = getAccentColor();
+                nodeData.circle.setAttribute('fill', accent);
+                if (nodeData.parentLine) nodeData.parentLine.setAttribute('stroke', accent);
+            }
+        }
+    });    
 }
 
 // 7. KEYBOARD NAVIGATION FOR SUGGESTIONS
