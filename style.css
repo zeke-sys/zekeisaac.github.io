@@ -477,6 +477,14 @@ body.light .nav-links button:hover {
     color: #000;
 }
 
+/* active state - works in both dark and light mode */
+.nav-links a.active,
+body.light .nav-links a.active {
+    color: var(--accent);
+    font-weight: 600;
+    background: rgba(0,123,255,0.18);
+}
+
 @media (max-width: 480px) {
     .nav-inner {
         padding: 12px 14px;
