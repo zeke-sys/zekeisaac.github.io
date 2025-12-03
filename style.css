@@ -71,6 +71,16 @@ body{
     font-weight: 700;
 }
 
+/* Hide hamburger on desktop */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    color: var(--text);
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
 /* HERO */
 .hero{padding:56px 0;display:flex;align-items:center}
 .hero-grid{display:grid;grid-template-columns:300px 1fr;gap:40px;align-items:center}
@@ -365,11 +375,61 @@ body.light .suggestions li.active {
   .about-grid{grid-template-columns:1fr}
   .projects-grid{grid-template-columns:repeat(2,1fr)}
 }
+
 /* Mobile Adjustment */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--text);
+    cursor: pointer;
+}
+
 @media (max-width:640px){
   .projects-grid{grid-template-columns:1fr}
-  .nav-links{gap:8px}
-  .nav-links a{padding:6px 8px}
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 58px;
+    right: 16px;
+    width: 180px;
+    background: vaar(--glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.45);
+    border-radius: 14px;
+    padding: 8px 0;
+    flex-direction: column;
+    animation: fadeDown 0.22s ease-out;
+    z-index: 999; 
+  }
+  .nav-links.open {
+    display: flex;
+  }
+  .nav-links a, .nav-links button {
+    padding: 12px 16px;
+    text-align: left;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .nav-links a:hover, .nav-links button:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* fade + slide animation */
+  @keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+
   .hero{padding:36px 0}
   .profile-img{width:220px;height:220px}
 
@@ -385,6 +445,12 @@ body.light .suggestions li.active {
     font-size: 2rem;
     top: 10px;
     right: 10px;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    margin-left: auto;
+    padding: 4px 10px;
   }
 }
 

@@ -133,4 +133,21 @@ document.querySelectorAll(".nav-links a").forEach(a => {
     }
 });
 
+// menu button on mobile
+const menuBtn = document.getElementById("mobile-menu-toggle");
+const navLinks = document.querySelector(".nav-links");
+
+menuBtn.addEventListener("click", () => {
+    const isOpen = navLinks.classList.toggle("open");
+    menuBtn.textContent = isOpen ? "✕" : "☰";  // icon changes
+});
+
+// Close menu when clicking outside
+document.addEventListener("click", (e) => {
+    if (!navLinks.contains(e.target) && e.target !== menuBtn) {
+        navLinks.classList.remove("open");
+        menuBtn.textContent = "☰"; // reset icon
+    }
+});
+
 // end of theme + animations script
