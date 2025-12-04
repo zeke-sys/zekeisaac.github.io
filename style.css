@@ -132,6 +132,15 @@ body.light .page-container img {
     border-radius: 16px;
 }
 
+body:not(.light) .page-container {
+    background: rgba(255, 255, 255, 0.03); /* soft transparent panel */
+    padding: 44px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px); /* subtle glass effect */
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06); /* faint border for definition */
+}
+
 /* PROJECTS GRID */
 .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .project-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 30px rgba(2,6,23,0.55);transition:transform .25s,box-shadow .25s}
@@ -474,11 +483,13 @@ body.light .nav-inner {
 }
 
 body:not(.light) .nav-links {
-    background: rgba(20,20,30,0.4);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.75); /* semi-transparent */
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 6px 12px;
+    backdrop-filter: blur(6px);      /* soft blur */
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
 body.light .nav-links a,
